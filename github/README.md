@@ -14,7 +14,10 @@ Generate fully type-safe TypeScript API clients from OpenAPI 3.0 specifications.
 **Authentication**: Built-in support for API keys and Bearer tokens  
 **Retry Logic**: Automatic retry with exponential backoff  
 **Rich JSDoc**: Auto-generated documentation with examples for every method  
-**Example Generator**: Automatically generates example usage files
+**Example Generator**: Automatically generates example usage files  
+**URL Support**: Generate clients directly from API endpoint URLs  
+**Interactive Mode**: User-friendly CLI with prompts for easy setup  
+**Web GUI**: Browser-based interface for generating clients
 
 ## Installation
 
@@ -24,11 +27,42 @@ npm install
 
 ## Usage
 
-### Generate a client from an OpenAPI spec
+### Interactive Mode (Recommended for First-Time Users)
+
+Run the CLI without arguments to launch interactive mode:
+
+```bash
+npm run generate
+```
+
+The CLI will prompt you for:
+1. **API endpoint URL or OpenAPI JSON file** - Enter a URL like `https://api.example.com/v1/users` or a file path like `petstore-api.json`
+2. **API key** (optional) - Enter your API key to have it included in the generated example file
+3. **Output filename** - Automatically generated based on your input, but you can customize it
+
+### Non-Interactive Mode
+
+Generate a client from an OpenAPI spec file:
 
 ```bash
 npm run generate petstore-api.json generated/petstore-client.ts
 ```
+
+Or with an API key included in the example:
+
+```bash
+npm run generate petstore-api.json generated/petstore-client.ts your-api-key
+```
+
+### Generate from API Endpoint URL
+
+You can generate a client directly from an API endpoint URL! The generator will automatically create an OpenAPI spec from the URL pattern:
+
+```bash
+npm run generate "https://api.example.com/v1/users?limit=10" api-client.ts
+```
+
+This is perfect for quick prototyping or when you don't have an OpenAPI spec file yet.
 
 ### Run the CLI via `npx`
 
@@ -41,13 +75,28 @@ npx openapi-typescript-client-generator petstore-api.json generated/petstore-cli
 ```
 
 Use the second argument to control the output path; omit it to fall back to the
-default `generated-client.ts`.
+default `generated-client.ts`. The third argument (optional) is your API key.
 
-**Works with any OpenAPI 3.0 spec!** Try it with:
+### Web GUI
+
+For a visual, browser-based experience, use the web GUI:
+
+```bash
+npm run gui
+```
+
+Then open your browser to `http://localhost:3000` to:
+- Enter API endpoint URLs or upload OpenAPI spec files
+- Configure API keys
+- Generate and download client code
+- Try popular APIs like OpenAI, GitHub, and Stripe
+
+**Works with any OpenAPI 3.0 spec or API endpoint URL!** Try it with:
 - Your own API specs
-- Public APIs (GitHub, Stripe, etc.)
+- Public APIs (GitHub, Stripe, OpenAI, etc.)
 - Internal microservices
 - Any OpenAPI 3.0 compliant specification
+- Direct API endpoint URLs
 
 ### Use the generated client
 
@@ -81,15 +130,35 @@ the CLI? Import the new programmatic API and work entirely in TypeScript:
 ```ts
 import { generateClientArtifacts } from 'openapi-typescript-client-generator';
 
+// From a file path
 const { client, example, className } = generateClientArtifacts('petstore-api.json');
+
+// From a URL (generates OpenAPI spec automatically)
+const { client, example, className } = generateClientArtifacts('https://api.example.com/v1/users');
+
+// From a parsed OpenAPISpec object
+const { client, example, className } = generateClientArtifacts(parsedSpec);
+
+// With options (include API key in example)
+const { client, example, className } = generateClientArtifacts('petstore-api.json', {
+  includeExample: true,
+  apiKey: 'your-api-key',
+  outputFileName: 'petstore-client.ts'
+});
 
 // Write the strings wherever your application expects them
 fs.writeFileSync(`./generated/${className}.ts`, client);
+if (example) {
+  fs.writeFileSync(`./generated/${className}-example.ts`, example);
+}
 ```
 
-`generateClientArtifacts` accepts either a path to a JSON file or a fully parsed
-`OpenAPISpec` object, making it trivial to plug into build tools, CLIs, or any
-Node-based application.
+`generateClientArtifacts` accepts:
+- A path to a JSON/YAML file
+- An API endpoint URL (auto-generates OpenAPI spec)
+- A fully parsed `OpenAPISpec` object
+
+This makes it trivial to plug into build tools, CLIs, or any Node-based application.
 
 Need to ship the latest changes to GitHub or npm? See
 [`docs/PUBLISHING.md`](docs/PUBLISHING.md) for a concise checklist that covers
@@ -183,10 +252,10 @@ The suite lives at [`tests/e2e/run-e2e.ts`](tests/e2e/run-e2e.ts). It shells out
 
 ## Impact
 
-- ✅ **Eliminated 90% of API-related bugs** - Type errors caught at compile time
-- ✅ **Autocomplete for all endpoints** - Better developer experience
-- ✅ **Refactoring safety** - TypeScript catches breaking changes
-- ✅ **Self-documenting code** - Types serve as inline documentation
+- **Eliminated 90% of API-related bugs** - Type errors caught at compile time
+- **Autocomplete for all endpoints** - Better developer experience
+- **Refactoring safety** - TypeScript catches breaking changes
+- **Self-documenting code** - Types serve as inline documentation
 
 ## Development
 
@@ -197,8 +266,17 @@ npm run build
 # Generate client (development)
 npm run generate petstore-api.json
 
+# Interactive mode
+npm run generate
+
 # Watch mode
 npm run dev
+
+# Run web GUI
+npm run gui
+
+# Run tests
+npm run test:e2e
 ```
 
 ## Technical Highlights
