@@ -10,6 +10,10 @@
  * code generator can easily work with.
  */
 
+// TypeScript Concepts:
+// - Type-only import: import type { ... } - imports only types, removed at compile time
+// - Named type imports: OpenAPISpec, Endpoint, Schema - these are interfaces/types defined in types.ts
+
 import type { OpenAPISpec, Endpoint, Schema } from './types.js';
 
 /**
@@ -21,6 +25,12 @@ import type { OpenAPISpec, Endpoint, Schema } from './types.js';
  * - Access schemas for type generation
  * - Get base URL from server configuration
  */
+// TypeScript Concepts:
+// - Class: export class - defines a class that can be imported by other modules
+// - Private properties: private spec - only accessible within this class
+// - Generic type: Map<string, Schema> - Map is a generic type with key type (string) and value type (Schema)
+// - Type initialization: = new Map() - initializes with empty Map, TypeScript infers the generic types
+
 export class OpenAPIParser {
   // The complete OpenAPI specification object
   private spec: OpenAPISpec;
@@ -55,6 +65,12 @@ export class OpenAPIParser {
    *       properties:
    *         name: { type: string }
    */
+  // TypeScript Concepts:
+  // - Return type annotation: : void - function doesn't return a value
+  // - Optional chaining: ?. - safely accesses properties that might be undefined
+  // - Type narrowing: after if check, TypeScript knows schemas exists
+  // - Destructuring in for loop: const [name, schema] - extracts key-value pairs
+  // - Type inference: TypeScript infers name is string, schema is Schema from Object.entries
   private loadSchemas(): void {
     // Optional chaining (?.) safely handles if components doesn't exist
     // This is common in OpenAPI specs that don't define schemas
@@ -87,6 +103,11 @@ export class OpenAPIParser {
    * 
    * @returns Array of all endpoints found in the spec
    */
+  // TypeScript Concepts:
+  // - Return type annotation: : Endpoint[] - returns an array of Endpoint objects
+  // - Array type syntax: Endpoint[] - alternative to Array<Endpoint>
+  // - Literal union type: 'get' | 'post' | 'put' | 'patch' | 'delete' - must be exactly one of these string values
+  // - Array generic syntax: Array<...> - alternative to [...] syntax
   public extractEndpoints(): Endpoint[] {
     const endpoints: Endpoint[] = [];
 
@@ -96,6 +117,9 @@ export class OpenAPIParser {
     for (const [path, pathItem] of Object.entries(this.spec.paths)) {
       // Array of HTTP methods we support
       // Type is a literal union - must be exactly one of these strings
+      // TypeScript Concepts:
+      // - Literal union type: restricts values to specific strings
+      // - Type safety: TypeScript will error if you try to use a value not in the union
       const methods: Array<'get' | 'post' | 'put' | 'patch' | 'delete'> = [
         'get',
         'post',
@@ -121,6 +145,10 @@ export class OpenAPIParser {
         // Parameters can be defined at path level (shared) or operation level (specific)
         // Combine both using spread operator
         // Example: path has { id: number }, operation adds { include?: string }
+        // TypeScript Concepts:
+        // - Spread operator: ...array - spreads array elements into new array
+        // - Default value: || [] - provides empty array if undefined
+        // - Type inference: TypeScript infers allParameters is Parameter[]
         const allParameters = [
           ...(pathItem.parameters || []),  // Path-level parameters
           ...(operation.parameters || []), // Operation-level parameters
@@ -188,6 +216,10 @@ export class OpenAPIParser {
    * @param schema - Schema that might be a reference
    * @returns The actual schema definition (resolved if it was a reference)
    */
+  // TypeScript Concepts:
+  // - Type guard: 'in' operator - checks if property exists, TypeScript narrows type after check
+  // - Type narrowing: after if ('$ref' in schema), TypeScript knows schema has $ref property
+  // - Map.get(): returns value or undefined, so we use || for fallback
   public resolveSchema(schema: Schema): Schema {
     // Type guard: check if this is a reference schema
     // 'in' operator checks if property exists
@@ -223,6 +255,9 @@ export class OpenAPIParser {
    * Provide read-only access to the schema map so the generator can ask for
    * definitions while preserving the parser’s responsibility of resolving refs.
    */
+  // TypeScript Concepts:
+  // - Return type annotation: : Map<string, Schema> - explicitly declares return type
+  // - Generic return type: Map is generic with key and value types
   public getSchemas(): Map<string, Schema> {
     return this.schemas;
   }

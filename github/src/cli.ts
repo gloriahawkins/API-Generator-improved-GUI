@@ -19,6 +19,11 @@ import { generateClientArtifacts } from './index.js';
 
 /**
  * Prompts the user for input using readline
+ * 
+ * TypeScript Concepts:
+ * - Return type annotation: Promise<string> - explicitly declares this function returns a Promise that resolves to a string
+ * - Generic type: Promise<T> - Promise is a generic type where T is the resolved value type
+ * - Arrow function: (answer) => { ... } - arrow function syntax, answer parameter is inferred as string from readline types
  */
 function prompt(question: string): Promise<string> {
   const rl = readline.createInterface({
@@ -37,6 +42,11 @@ function prompt(question: string): Promise<string> {
 
 /**
  * Check if a string is a URL
+ * 
+ * TypeScript Concepts:
+ * - Return type annotation: boolean - explicitly declares return type
+ * - Parameter type annotation: str: string - parameter must be a string
+ * - Try-catch without catch parameter: catch { } - TypeScript allows omitting the error parameter if unused
  */
 function isUrl(str: string): boolean {
   try {
@@ -49,6 +59,11 @@ function isUrl(str: string): boolean {
 
 /**
  * Generate a smart filename from API URL or input
+ * 
+ * TypeScript Concepts:
+ * - Optional parameter: apiName?: string - the ? makes this parameter optional
+ * - Optional parameters must come after required parameters
+ * - Return type annotation: string - function must return a string
  */
 function generateOutputFileName(input: string, apiName?: string): string {
   if (isUrl(input)) {
@@ -73,15 +88,20 @@ function generateOutputFileName(input: string, apiName?: string): string {
 
 /**
  * Main interactive flow - SIMPLIFIED: Just URL and API key
+ * 
+ * TypeScript Concepts:
+ * - Async function: async function - allows using await inside
+ * - Await: await prompt(...) - waits for Promise to resolve before continuing
+ * - Logical OR with undefined: apiKey || undefined - converts empty string to undefined
  */
 async function interactiveMode() {
-  console.log('🚀 OpenAPI TypeScript Client Generator\n');
+  console.log('OpenAPI TypeScript Client Generator\n');
   
   // Just ask for the URL/endpoint
   const input = await prompt('Enter your API endpoint URL (or OpenAPI JSON file): ');
   
   if (!input || input.trim().length === 0) {
-    console.error('❌ Please provide an API endpoint URL or file path.');
+    console.error('Error: Please provide an API endpoint URL or file path.');
     process.exit(1);
   }
   
@@ -97,6 +117,11 @@ async function interactiveMode() {
 
 /**
  * Non-interactive mode (for CI/automation)
+ * 
+ * TypeScript Concepts:
+ * - Array type: string[] - parameter is an array of strings
+ * - Array access: args[0], args[1] - accessing array elements (TypeScript knows these are strings or undefined)
+ * - Default value: args[1] || 'generated-client.ts' - uses default if undefined
  */
 function nonInteractiveMode(args: string[]) {
   const inputFile = args[0];
@@ -108,6 +133,13 @@ function nonInteractiveMode(args: string[]) {
 
 /**
  * Generate client and write to disk
+ * 
+ * TypeScript Concepts:
+ * - Optional parameter: apiKey?: string - parameter is optional
+ * - Destructuring assignment: const { client, example, ... } = ... - extracts properties from object
+ * - Type inference: TypeScript infers types of destructured variables from return type
+ * - Optional chaining: if (example) - checks if property exists before using
+ * - Type narrowing: TypeScript knows example is defined inside the if block
  */
 async function generateAndWrite(
   input: string,
@@ -117,9 +149,9 @@ async function generateAndWrite(
   try {
     const isInputUrl = isUrl(input);
     if (isInputUrl) {
-      console.log(`\n🌐 Generating client from API URL...`);
+      console.log(`\nGenerating client from API URL...`);
     } else {
-      console.log(`\n📖 Reading OpenAPI spec...`);
+      console.log(`\nReading OpenAPI spec...`);
     }
     
     const { client, example, endpoints, className, baseUrl } = generateClientArtifacts(input, {
@@ -128,25 +160,25 @@ async function generateAndWrite(
       outputFileName: outputFile, // Pass output file name for correct imports
     });
 
-    console.log('✍️  Writing generated client to disk...');
+    console.log('Writing generated client to disk...');
     writeFileSync(outputFile, client, 'utf-8');
 
     // Keep the example file co-located by mirroring the primary file name.
     const exampleFile = outputFile.replace('.ts', '-example.ts');
     if (example) {
-      console.log(`📝 Generating example usage file: ${exampleFile}`);
+      console.log(`Generating example usage file: ${exampleFile}`);
       writeFileSync(exampleFile, example, 'utf-8');
     }
 
-    console.log(`\n✅ Done! Generated ${endpoints.length} endpoint(s).`);
-    console.log(`\n📁 Files created:`);
+    console.log(`\nDone! Generated ${endpoints.length} endpoint(s).`);
+    console.log(`\nFiles created:`);
     console.log(`   ${outputFile}`);
     if (example) {
       console.log(`   ${exampleFile}`);
     }
     
     if (example) {
-      console.log(`\n💡 Quick start:`);
+      console.log(`\nQuick start:`);
       const importPath = outputFile.replace('.ts', '');
       console.log(`   import { ${className} } from './${importPath}';`);
       console.log(`   const client = new ${className}('${baseUrl}');`);
@@ -156,11 +188,19 @@ async function generateAndWrite(
       console.log(`\n   Or run the example: tsx ${exampleFile}`);
     }
   } catch (error) {
-    console.error('❌ Error generating client:', error);
+    console.error('Error generating client:', error);
     process.exit(1);
   }
 }
 
+/**
+ * Main entry point
+ * 
+ * TypeScript Concepts:
+ * - Array method: process.argv.slice(2) - returns array of strings
+ * - Promise handling: .catch() - handles rejected promises
+ * - Arrow function: (error) => { ... } - error parameter type is inferred as Error or unknown
+ */
 function main() {
   // Drop the node + script entries and only keep user-provided arguments.
   const args = process.argv.slice(2);
@@ -168,7 +208,7 @@ function main() {
   if (args.length === 0) {
     // Interactive mode - prompt for all inputs
     interactiveMode().catch((error) => {
-      console.error('❌ Error:', error);
+      console.error('Error:', error);
       process.exit(1);
     });
   } else {

@@ -1,3 +1,7 @@
+// TypeScript Concepts:
+// - Type-only import: import type { Endpoint } - imports only the type, removed at compile time
+// - Regular import: import { OpenAPIParser } - imports the class for runtime use
+
 import type { Endpoint } from './types.js';
 import { OpenAPIParser } from './parser.js';
 
@@ -10,6 +14,11 @@ import { OpenAPIParser } from './parser.js';
  * - Sampling only the first few endpoints keeps the file approachable while still
  *   teaching the ergonomics.
  */
+// TypeScript Concepts:
+// - Class: export class - can be imported by other modules
+// - Private properties: private - only accessible within this class
+// - Property types: parser: OpenAPIParser, className: string - TypeScript enforces these types
+
 export class ExampleGenerator {
   private parser: OpenAPIParser;
   private className: string;
@@ -29,6 +38,11 @@ export class ExampleGenerator {
    * Detects if an API key parameter exists in query parameters
    * Supports common API key naming patterns
    */
+  // TypeScript Concepts:
+  // - Return type annotation: { found: boolean; paramName: string | null } - object with specific shape
+  // - Object type literal: { found: boolean; ... } - inline type definition
+  // - Union type: string | null - can be either string or null
+  // - Array parameter: Endpoint[] - array of Endpoint objects
   private detectApiKeyQueryParam(endpoints: Endpoint[]): { found: boolean; paramName: string | null } {
     // Common API key parameter names (case-insensitive)
     // Supports: key, api_key, apikey, api-key, token, access_token, etc.
@@ -75,6 +89,9 @@ export class ExampleGenerator {
    * 
    * @param apiKey Optional API key to include in the example
    */
+  // TypeScript Concepts:
+  // - Optional parameter: apiKey?: string - parameter may be undefined
+  // - Return type annotation: : string - function must return a string
   public generate(apiKey?: string): string {
     const endpoints = this.parser.extractEndpoints();
     const baseUrl = this.parser.getBaseUrl();
@@ -114,16 +131,16 @@ export class ExampleGenerator {
  * - Authentication
  * - Retry configuration
  * 
- * 🚀 READY TO RUN! Just execute:
+ *  READY TO RUN! Just execute:
  *   npx tsx ${this.getClientFileName().replace('.js', '-example.ts')}
  * 
- * ${apiKey ? '✅ API key is already included - no setup needed!' : '⚠️  Replace YOUR_API_KEY_HERE with your actual API key, or set $env:API_KEY="your-key"'}
+ * ${apiKey ? ' API key is already included - no setup needed!' : '  Replace YOUR_API_KEY_HERE with your actual API key, or set $env:API_KEY="your-key"'}
  */
 
 import { ${this.className} } from './${this.getClientFileName()}';
 
 ${hasKeyQueryParam ? `// API key for this API (uses '${apiKeyQueryParam.paramName}' as a query parameter)
-${apiKey ? `const API_KEY = '${apiKey}'; // ✅ API key included - ready to run!` : `const API_KEY = process.env.API_KEY || 'YOUR_API_KEY_HERE'; // ⚠️ Replace with your actual API key`}
+${apiKey ? `const API_KEY = '${apiKey}'; // API key included - ready to run!` : `const API_KEY = process.env.API_KEY || 'YOUR_API_KEY_HERE'; // Replace with your actual API key`}
 
 ` : ''}// Initialize the client
 const client = new ${this.className}({
@@ -174,6 +191,9 @@ examples().catch(console.error);
    * example intentionally demonstrates the core ergonomics reviewers care about:
    * path params, query params, request bodies, and discriminated-union handling.
    */
+  // TypeScript Concepts:
+  // - Parameter type: endpoint: Endpoint - must be an Endpoint object
+  // - Return type: : string - returns a string
   private generateEndpointExample(endpoint: Endpoint): string {
     const methodName = this.sanitizeMethodName(endpoint.operationId);
     const pathParams = endpoint.parameters.filter((p) => p.in === 'path');
@@ -191,7 +211,12 @@ examples().catch(console.error);
     example += `    const result = await client.${methodName}(`;
 
     const params: string[] = [];
-    // Helper to check if schema has a type property
+    // TypeScript Concepts:
+    // - Type predicate: (schema?: any): schema is { type: string; ... } - type guard function
+    // - Type predicate return: schema is { ... } - tells TypeScript to narrow type after this check
+    // - Optional parameter: schema?: any - may be undefined
+    // - Index signature: [key: string]: any - object can have any string keys
+    // - Type guard: 'type' in schema - checks if property exists
     const hasType = (schema?: any): schema is { type: string; [key: string]: any } => {
       return schema && 'type' in schema && !('$ref' in schema);
     };
@@ -258,10 +283,17 @@ examples().catch(console.error);
   /**
    * Get the client file name - will be set by the caller
    */
+  // TypeScript Concepts:
+  // - Property with default value: = 'generated-client.js' - initializes property
+  // - Type annotation: : string - property must be a string
   private clientFileName: string = 'generated-client.js';
   
   /**
    * Set the client file name for proper imports
+   * 
+   * TypeScript Concepts:
+   * - Return type: : void - function doesn't return a value
+   * - Parameter type: fileName: string - must be a string
    */
   public setClientFileName(fileName: string): void {
     // Convert "path/to/client.ts" to "client.js" for import
@@ -272,6 +304,9 @@ examples().catch(console.error);
   /**
    * Get the client file name from the class name
    */
+  // TypeScript Concepts:
+  // - Return type annotation: : string - function returns a string
+  // - Private method: private - only accessible within this class
   private getClientFileName(): string {
     return this.clientFileName;
   }

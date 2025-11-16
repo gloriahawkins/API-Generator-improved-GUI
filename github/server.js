@@ -466,7 +466,7 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`🚀 GUI Server running at http://localhost:${PORT}`);
+  console.log(`GUI Server running at http://localhost:${PORT}`);
   console.log(`   Open in your browser to generate API clients!`);
 });
 

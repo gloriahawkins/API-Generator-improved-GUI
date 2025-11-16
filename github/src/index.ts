@@ -6,6 +6,11 @@
  * embed the generator programmatically without reaching into private files.
  */
 
+// TypeScript Concepts:
+// - Named imports: import { ... } from '...' - imports specific exports
+// - Type-only imports: import type { ... } - imports only types (removed at runtime)
+// - Node.js built-in modules: 'node:fs', 'node:path' - explicit Node.js module imports
+
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -16,6 +21,11 @@ import type { Endpoint, OpenAPISpec } from './types.js';
 
 /**
  * Check if a string is a URL
+ * 
+ * TypeScript Concepts:
+ * - Return type annotation: boolean
+ * - Parameter type annotation: str: string
+ * - Try-catch without error parameter: catch { } - TypeScript allows this
  */
 function isUrl(str: string): boolean {
   try {
@@ -49,6 +59,9 @@ function generateSpecFromUrl(urlString: string): OpenAPISpec {
   }
   
   // Extract query parameters
+  // TypeScript Concepts:
+  // - Type annotation: any[] - array of any type (used when type is unknown at compile time)
+  // - Note: 'any' disables type checking - use sparingly, but needed here for dynamic OpenAPI spec generation
   const parameters: any[] = [];
   url.searchParams.forEach((value, key) => {
     // Determine parameter type based on value
@@ -141,7 +154,7 @@ function normalizeSpec(input: OpenAPISpec | string): OpenAPISpec {
   if (typeof input === 'string') {
     // Check if it's a URL
     if (isUrl(input)) {
-      console.log(`🌐 Detected URL, generating OpenAPI spec from endpoint pattern...`);
+      console.log(`Detected URL, generating OpenAPI spec from endpoint pattern...`);
       return generateSpecFromUrl(input);
     }
     
@@ -151,11 +164,19 @@ function normalizeSpec(input: OpenAPISpec | string): OpenAPISpec {
       throw new Error(`File not found: ${absolutePath}`);
     }
     const raw = readFileSync(absolutePath, 'utf-8');
+    // TypeScript Concepts:
+    // - Type assertion: as OpenAPISpec - tells TypeScript to treat the result as OpenAPISpec type
+    // - Type assertions bypass type checking - use when you know the type better than TypeScript
     return JSON.parse(raw) as OpenAPISpec;
   }
 
   return input;
 }
+
+// TypeScript Concepts:
+// - Interface: defines the shape of an object
+// - Optional properties: property?: type - property may be undefined
+// - JSDoc comments: /** */ - documentation that appears in IDE tooltips
 
 export interface GenerateClientArtifactsOptions {
   /**
@@ -174,6 +195,11 @@ export interface GenerateClientArtifactsOptions {
   outputFileName?: string;
 }
 
+// TypeScript Concepts:
+// - Interface with required and optional properties
+// - Array type: Endpoint[] - array of Endpoint objects
+// - Optional property: example?: string - may be undefined
+
 export interface GeneratedClientArtifacts {
   /** Name of the generated client class (e.g., `PetStoreAPIClient`). */
   className: string;
@@ -191,6 +217,12 @@ export interface GeneratedClientArtifacts {
  * Generate client + example source code from either a parsed spec object or a
  * path to an OpenAPI JSON file. The helper is synchronous to mirror the CLI and
  * to keep usage simple inside build scripts.
+ * 
+ * TypeScript Concepts:
+ * - Union type parameter: specInput: OpenAPISpec | string - parameter can be either type
+ * - Default parameter value: options = {} - if not provided, uses empty object
+ * - Return type annotation: : GeneratedClientArtifacts - function must return this type
+ * - Generic types: OpenAPISpec, GeneratedClientArtifacts - custom types defined in types.ts
  */
 export function generateClientArtifacts(
   specInput: OpenAPISpec | string,
@@ -204,6 +236,9 @@ export function generateClientArtifacts(
   const endpoints = parser.extractEndpoints();
   const baseUrl = parser.getBaseUrl();
 
+  // TypeScript Concepts:
+  // - Union type variable: string | undefined - can be either string or undefined
+  // - Explicit initialization: let example: string | undefined; - starts as undefined
   let example: string | undefined;
   if (options.includeExample !== false) {
     const exampleGenerator = new ExampleGenerator(parser, className);

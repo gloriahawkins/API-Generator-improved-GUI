@@ -14,6 +14,11 @@
  * - Full JSDoc documentation generation
  */
 
+// TypeScript Concepts:
+// - Type-only imports: import type { ... } - imports only types, removed at compile time
+// - Multiple type imports: Endpoint, Schema, Parameter, RequestBody - all are interfaces/types
+// - Regular import: import { OpenAPIParser } - imports the class for runtime use
+
 import type { Endpoint, Schema, Parameter, RequestBody } from './types.js';
 import { OpenAPIParser } from './parser.js';
 
@@ -23,6 +28,13 @@ import { OpenAPIParser } from './parser.js';
  * This is a code generator - it writes TypeScript code as strings, which will
  * be written to a file and used as a type-safe API client.
  */
+// TypeScript Concepts:
+// - Class: export class - can be imported by other modules
+// - Private properties: private - only accessible within this class
+// - Readonly property: readonly - cannot be reassigned after initialization
+// - Type inference: indentLevel = 0 - TypeScript infers type as number
+// - Explicit initialization: = '  ' - initializes property with value
+
 export class TypeScriptClientGenerator {
   // Parser instance that extracts endpoints and schemas from OpenAPI spec
   private parser: OpenAPIParser;
@@ -53,6 +65,9 @@ export class TypeScriptClientGenerator {
    * 
    * @returns Complete TypeScript code as a string (ready to write to file)
    */
+  // TypeScript Concepts:
+  // - Return type annotation: : string - function returns a string (the generated code)
+  // - Public method: public - can be called from outside the class
   public generate(): string {
     // Extract all API endpoints (GET /users, POST /products, etc.)
     const endpoints = this.parser.extractEndpoints();
@@ -254,6 +269,11 @@ export type ResponseInterceptor<T = unknown> = (response: Response, data: T) => 
    * - { type: 'array', items: { type: 'string' } } -> "Array<string>"
    * - { type: 'object', properties: { name: { type: 'string' } } } -> "{ name: string }"
    */
+  // TypeScript Concepts:
+  // - Parameter types: schema: Schema, visited: Set<string> - TypeScript enforces these types
+  // - Default parameter value: visited = new Set() - if not provided, uses new empty Set
+  // - Generic type: Set<string> - Set is generic, contains strings
+  // - Return type: : string - returns TypeScript type as string
   private schemaToType(schema: Schema, visited: Set<string> = new Set()): string {
     // First, resolve any $ref references to get the actual schema
     const resolved = this.parser.resolveSchema(schema);
@@ -422,6 +442,10 @@ export type ResponseInterceptor<T = unknown> = (response: Response, data: T) => 
    * @param endpoints - Array of all endpoints to generate methods for
    * @returns Complete class definition as string
    */
+  // TypeScript Concepts:
+  // - Multiple parameters with types: each parameter has explicit type annotation
+  // - Array type: Endpoint[] - array of Endpoint objects
+  // - Return type: : string - returns generated class code as string
   private generateClientClass(
     className: string,
     baseUrl: string,
