@@ -4,17 +4,17 @@ Generate fully type-safe TypeScript API clients from OpenAPI 3.0 specifications.
 
 ## Features
 
-✨ **Type Safety**: Full TypeScript types for all requests, responses, and parameters  
-🚀 **Autocomplete**: IntelliSense support for all API operations  
-🔒 **Compile-time Validation**: Catch errors before runtime  
-📦 **Zero Runtime Dependencies**: Generated code is pure TypeScript  
-⚡ **Advanced TypeScript**: Uses generics, conditional types, and template literal types  
-🎯 **Discriminated Unions**: Type-safe error handling with `ApiResult<T>` pattern  
-🔄 **Interceptors**: Request/response interceptors with full type safety  
-🔐 **Authentication**: Built-in support for API keys and Bearer tokens  
-🔁 **Retry Logic**: Automatic retry with exponential backoff  
-📚 **Rich JSDoc**: Auto-generated documentation with examples for every method  
-📝 **Example Generator**: Automatically generates example usage files
+**Type Safety**: Full TypeScript types for all requests, responses, and parameters  
+**Autocomplete**: IntelliSense support for all API operations  
+**Compile-time Validation**: Catch errors before runtime  
+**Zero Runtime Dependencies**: Generated code is pure TypeScript  
+**Advanced TypeScript**: Uses generics, conditional types, and template literal types  
+**Discriminated Unions**: Type-safe error handling with `ApiResult<T>` pattern  
+**Interceptors**: Request/response interceptors with full type safety  
+**Authentication**: Built-in support for API keys and Bearer tokens  
+**Retry Logic**: Automatic retry with exponential backoff  
+**Rich JSDoc**: Auto-generated documentation with examples for every method  
+**Example Generator**: Automatically generates example usage files
 
 ## Installation
 
