@@ -1,0 +1,44 @@
+{
+  "name": "openapi-typescript-client-generator",
+  "version": "1.0.0",
+  "description": "Generate type-safe TypeScript clients from OpenAPI specifications",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "bin": {
+    "openapi-typescript-client-generator": "dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./cli": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "generate": "tsx src/cli.ts",
+    "dev": "tsx watch src/cli.ts",
+    "test:e2e": "tsx tests/e2e/run-e2e.ts",
+    "run": "tsx",
+    "gui": "npm run build && node server.js"
+  },
+  "keywords": [
+    "openapi",
+    "typescript",
+    "code-generation",
+    "type-safe",
+    "api-client"
+  ],
+  "author": "Gloria",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  }
+}
+
